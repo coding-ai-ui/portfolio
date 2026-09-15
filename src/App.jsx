@@ -13,6 +13,10 @@ import {
   Linkedin,
   Globe2,
   Plus,
+  LockKeyhole,
+  LogOut,
+  Trash2,
+  ArrowLeft,
 } from "lucide-react";
 
 // Replace null values with your real profile URLs and email when ready.
@@ -76,6 +80,111 @@ const projects = [
     note: "An application concept focused on student organization.",
   },
 ];
+const projectsStorageKey = "houssam-portfolio-projects";
+const adminSessionKey = "houssam-portfolio-admin";
+const emptyProject = {
+  name: "",
+  category: "WEB · PROJECT",
+  type: "Website project",
+  description: "",
+  details: "",
+  note: "",
+  tags: "React, UI/UX",
+  url: "",
+};
+
+function readProjects() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(projectsStorageKey));
+    return Array.isArray(stored) ? stored : projects;
+  } catch {
+    return projects;
+  }
+}
+
+function AdminPage({ projects, onSave, onLogout }) {
+  const [draft, setDraft] = useState(emptyProject);
+  const [editingId, setEditingId] = useState(null);
+  const [message, setMessage] = useState("");
+  const isEditing = Boolean(editingId);
+
+  const resetForm = () => {
+    setDraft(emptyProject);
+    setEditingId(null);
+    setMessage("");
+  };
+
+  const submitProject = (event) => {
+    event.preventDefault();
+    const name = draft.name.trim();
+    if (!name || !draft.description.trim() || !draft.details.trim()) {
+      setMessage("Name, description, and details are required.");
+      return;
+    }
+    const project = {
+      ...draft,
+      name,
+      description: draft.description.trim(),
+      details: draft.details.trim(),
+      note: draft.note.trim(),
+      category: draft.category.trim() || "WEB · PROJECT",
+      type: draft.type.trim() || "Website project",
+      tags: draft.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      url: draft.url.trim(),
+    };
+    const nextProjects = isEditing
+      ? projects.map((item) => item.id === editingId ? { ...item, ...project } : item)
+      : [...projects, { ...project, id: `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`, number: String(projects.length + 1).padStart(2, "0") }];
+    onSave(nextProjects);
+    setMessage(isEditing ? "Project updated." : "Project added.");
+    resetForm();
+  };
+
+  const editProject = (project) => {
+    setEditingId(project.id);
+    setDraft({ ...project, tags: project.tags.join(", ") });
+    setMessage("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const deleteProject = (id) => {
+    if (!window.confirm("Delete this project from the portfolio?")) return;
+    onSave(projects.filter((project) => project.id !== id));
+    if (editingId === id) resetForm();
+    setMessage("Project deleted.");
+  };
+
+  return (
+    <main className="admin-page">
+      <div className="admin-shell">
+        <div className="admin-topbar"><a className="text-link" href="#home"><ArrowLeft size={16} /> Back to portfolio</a><button className="text-link admin-logout" onClick={onLogout}><LogOut size={16} /> Log out</button></div>
+        <div className="admin-heading"><div className="eyebrow"><span className="small-line" /> ADMIN / PROJECTS</div><h1>Shape the work<span className="accent-word">.</span></h1><p>Manage the projects shown on your public portfolio.</p></div>
+        <div className="admin-grid">
+          <form className="admin-form" onSubmit={submitProject}>
+            <div className="admin-form-heading"><h2>{isEditing ? "Edit project" : "Add a project"}</h2>{isEditing && <button type="button" className="text-link" onClick={resetForm}>Cancel</button>}</div>
+            <label>Project name<input value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} placeholder="Project name" /></label>
+            <label>Category<input value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} /></label>
+            <label>Short description<textarea rows="3" value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} placeholder="What is this project about?" /></label>
+            <label>Full details<textarea rows="4" value={draft.details} onChange={(event) => setDraft({ ...draft, details: event.target.value })} placeholder="Describe the project in more detail." /></label>
+            <div className="admin-form-row"><label>Type<input value={draft.type} onChange={(event) => setDraft({ ...draft, type: event.target.value })} /></label><label>Tags<input value={draft.tags} onChange={(event) => setDraft({ ...draft, tags: event.target.value })} placeholder="React, UI/UX" /></label></div>
+            <label>Live URL <span className="field-hint">optional</span><input type="url" value={draft.url} onChange={(event) => setDraft({ ...draft, url: event.target.value })} placeholder="https://example.com" /></label>
+            <label>Note <span className="field-hint">optional</span><input value={draft.note} onChange={(event) => setDraft({ ...draft, note: event.target.value })} placeholder="A small context note" /></label>
+            <button className="button primary admin-submit" type="submit"><Plus size={18} /> {isEditing ? "Save changes" : "Add project"}</button>
+            {message && <p className="admin-message" role="status">{message}</p>}
+          </form>
+          <section className="admin-list" aria-labelledby="project-list-title"><div className="admin-form-heading"><h2 id="project-list-title">Published projects</h2><span>{projects.length} total</span></div>{projects.map((project) => <article className="admin-project" key={project.id}><div><span className="admin-project-number">{project.number}</span><div><h3>{project.name}</h3><p>{project.category}</p></div></div><div className="admin-project-actions"><button className="icon-button" aria-label={`Edit ${project.name}`} onClick={() => editProject(project)}><PenTool size={17} /></button><button className="icon-button danger" aria-label={`Delete ${project.name}`} onClick={() => deleteProject(project.id)}><Trash2 size={17} /></button></div></article>)}</section>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function AdminGate({ onUnlock }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const submit = (event) => { event.preventDefault(); if (code === "2010") onUnlock(); else setError("That access code is not correct."); };
+  return <main className="admin-gate"><form className="admin-gate-card" onSubmit={submit}><span className="admin-lock"><LockKeyhole size={22} /></span><div className="eyebrow"><span className="small-line" /> PRIVATE AREA</div><h1>Welcome back<span className="accent-word">.</span></h1><p>Enter your access code to manage the portfolio.</p><label>Access code<input autoFocus inputMode="numeric" type="password" value={code} onChange={(event) => setCode(event.target.value)} aria-describedby="admin-error" /></label>{error && <span className="admin-error" id="admin-error" role="alert">{error}</span>}<button className="button primary admin-submit" type="submit">Enter admin</button><a className="text-link" href="#home"><ArrowLeft size={16} /> Return to portfolio</a></form></main>;
+}
 
 function ProjectPreview({ id }) {
   return (
@@ -328,6 +437,11 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => document.documentElement.dataset.theme || "light",
   );
+  const [portfolioProjects, setPortfolioProjects] = useState(readProjects);
+  const [adminPath, setAdminPath] = useState(() => window.location.hash === "#admin");
+  const [adminUnlocked, setAdminUnlocked] = useState(
+    () => sessionStorage.getItem(adminSessionKey) === "true",
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [detail, setDetail] = useState(null);
   useEffect(() => {
@@ -336,6 +450,16 @@ export default function App() {
       localStorage.setItem("portfolio-theme", theme);
     } catch {}
   }, [theme]);
+  useEffect(() => {
+    const handleHashChange = () => setAdminPath(window.location.hash === "#admin");
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+  useEffect(() => {
+    try {
+      localStorage.setItem(projectsStorageKey, JSON.stringify(portfolioProjects));
+    } catch {}
+  }, [portfolioProjects]);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) =>
@@ -360,6 +484,26 @@ export default function App() {
       note: "This is a placeholder while my portfolio is being set up.",
     });
   };
+  const unlockAdmin = () => {
+    sessionStorage.setItem(adminSessionKey, "true");
+    setAdminUnlocked(true);
+  };
+  const logoutAdmin = () => {
+    sessionStorage.removeItem(adminSessionKey);
+    setAdminUnlocked(false);
+    window.location.hash = "home";
+  };
+  if (adminPath) {
+    return adminUnlocked ? (
+      <AdminPage
+        projects={portfolioProjects}
+        onSave={setPortfolioProjects}
+        onLogout={logoutAdmin}
+      />
+    ) : (
+      <AdminGate onUnlock={unlockAdmin} />
+    );
+  }
   return (
     <>
       <a className="skip-link" href="#main">
@@ -522,7 +666,7 @@ export default function App() {
               exploring, and learning along the way.
             </SectionTitle>
             <div className="projects-grid">
-              {projects.map((project) => (
+              {portfolioProjects.map((project) => (
                 <article className="project-card reveal" key={project.id}>
                   <button
                     className="project-visual-button"
@@ -786,6 +930,9 @@ export default function App() {
         <span>© {new Date().getFullYear()} Houssam El Orabi</span>
         <a href="#home">
           Back to top <ArrowUpRight size={15} />
+        </a>
+        <a className="admin-link" href="#admin">
+          <LockKeyhole size={14} /> Admin
         </a>
       </footer>
       {detail && (
