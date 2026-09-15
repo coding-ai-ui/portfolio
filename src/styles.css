@@ -515,13 +515,66 @@ h1 {
   isolation: isolate;
   transition: filter 0.4s;
 }
+.browser-window {
+  height: 320px;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  background: #f7f8fb;
+  box-shadow: 0 20px 50px #1d2b3b30;
+}
+.browser-toolbar {
+  height: 31px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 11px;
+  background: #eef0f4;
+  color: #737986;
+  font-size: 8px;
+}
+.browser-dots {
+  display: flex;
+  gap: 4px;
+}
+.browser-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #c4c8d0;
+}
+.browser-dots i:first-child {
+  background: #ef9b8f;
+}
+.browser-dots i:nth-child(2) {
+  background: #e7c37c;
+}
+.browser-dots i:nth-child(3) {
+  background: #9fc899;
+}
+.browser-address {
+  min-width: 0;
+  flex: 1;
+  padding: 5px 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #ffffffaa;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.browser-menu {
+  letter-spacing: 1px;
+}
+.browser-page {
+  height: 289px;
+  overflow: hidden;
+}
 .project-visual-button:hover .project-preview {
   filter: brightness(1.06);
 }
-.project-visual-button:hover .project-preview > div {
+.project-visual-button:hover .project-preview > .browser-window {
   transform: translateY(-5px);
 }
-.project-preview > div {
+.project-preview > .browser-window {
   transition: transform 0.4s;
 }
 .preview-caption {

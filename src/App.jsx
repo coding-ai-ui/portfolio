@@ -187,9 +187,22 @@ function AdminGate({ onUnlock }) {
 }
 
 function ProjectPreview({ id }) {
+  const previewUrls = {
+    vestra: "vextra-93ix.onrender.com/projects",
+    aurevia: "aurevia.community",
+    carzone: "carzone.design",
+    planner: "studyplanner.app",
+  };
   return (
     <div className={`project-preview ${id}`} aria-hidden="true">
-      {id === "vestra" && (
+      <div className="browser-window">
+        <div className="browser-toolbar">
+          <span className="browser-dots"><i /><i /><i /></span>
+          <span className="browser-address">{previewUrls[id] || "project-preview.local"}</span>
+          <span className="browser-menu">•••</span>
+        </div>
+        <div className="browser-page">
+        {id === "vestra" && (
         <div className="finance-ui">
           <div className="mock-nav">
             <strong>
@@ -239,7 +252,7 @@ function ProjectPreview({ id }) {
           </div>
         </div>
       )}
-      {id === "aurevia" && (
+        {id === "aurevia" && (
         <div className="knowledge-ui">
           <div className="mock-nav">
             <strong>
@@ -272,7 +285,7 @@ function ProjectPreview({ id }) {
           </div>
         </div>
       )}
-      {id === "carzone" && (
+        {id === "carzone" && (
         <div className="car-ui">
           <div className="mock-nav">
             <strong>
@@ -295,7 +308,7 @@ function ProjectPreview({ id }) {
           <span className="car-watermark">CZ</span>
         </div>
       )}
-      {id === "planner" && (
+        {id === "planner" && (
         <div className="planner-ui">
           <div className="planner-sidebar">
             <span className="planner-logo">
@@ -340,7 +353,9 @@ function ProjectPreview({ id }) {
           </div>
         </div>
       )}
-      <span className="preview-caption">CONCEPT VISUAL</span>
+        </div>
+      </div>
+      <span className="preview-caption">PROJECT PREVIEW</span>
     </div>
   );
 }
