@@ -506,6 +506,15 @@ h1 {
   border-radius: 14px;
   overflow: hidden;
   text-align: left;
+  background: transparent;
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.project-visual-button:focus-visible,
+.project-visual-button:hover {
+  box-shadow: 0 14px 34px #1d2b3b1c;
+}
+.project-visual-button:active {
+  transform: scale(0.99);
 }
 .project-preview {
   height: 310px;
@@ -516,7 +525,7 @@ h1 {
   transition: filter 0.4s;
 }
 .browser-window {
-  height: 320px;
+  height: 100%;
   border-radius: 10px 10px 0 0;
   overflow: hidden;
   background: #f7f8fb;
@@ -565,8 +574,12 @@ h1 {
   letter-spacing: 1px;
 }
 .browser-page {
-  height: 289px;
+  height: calc(100% - 31px);
   overflow: hidden;
+}
+.browser-page > div {
+  height: 100%;
+  min-height: 0;
 }
 .project-visual-button:hover .project-preview {
   filter: brightness(1.06);
@@ -583,7 +596,11 @@ h1 {
   bottom: 11px;
   font-size: 8px;
   letter-spacing: 1.7px;
-  opacity: 0.6;
+  padding: 5px 7px;
+  border-radius: 4px;
+  background: #101322b8;
+  color: #fff;
+  opacity: 0.85;
 }
 .vestra {
   background: #d8ddd4;
@@ -1245,13 +1262,6 @@ h1 {
   height: 30px;
   border-radius: 8px;
 }
-.footer .monogram span {
-  bottom: 3px;
-  right: 4px;
-}
-.footer > span {
-  font-size: 11px;
-}
 .footer > a:last-child {
   font-size: 11px;
   display: flex;
@@ -1316,6 +1326,9 @@ h1 {
     transform: translateY(0);
   }
 }
+section[id] {
+  scroll-margin-top: 112px;
+}
 @media (min-width: 1500px) {
   .hero {
     min-height: 850px;
@@ -1376,8 +1389,8 @@ h1 {
     gap: 40px;
   }
   .project-preview {
-    height: 310px;
-    padding: 35px 30px 0;
+    height: 330px;
+    padding: 25px 30px 0;
   }
   .project-meta {
     font-size: 9px;
@@ -1464,8 +1477,8 @@ h1 {
 }
 @media (max-width: 390px) {
   .project-preview {
-    padding: 25px 15px 0;
-    height: 285px;
+    padding: 20px 15px 0;
+    height: 310px;
   }
   .knowledge-body h4 {
     font-size: 22px;
